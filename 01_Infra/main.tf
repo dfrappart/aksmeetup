@@ -297,12 +297,12 @@ module "UAI1" {
 
 resource "local_file" "podidentitymanifest" {
   content                                 = module.UAI1.podidentitymanifest
-  filename                                = "../02_PodIdentity_Yaml/${module.UAI1.Name}.yaml"
+  filename                                = "../02_PodIdentity_Yaml/PodId/${module.UAI1.Name}.yaml"
 }
 
 resource "local_file" "podidentitybindingmanifest" {
   content                                 = module.UAI1.podidentitybindingmanifest
-  filename                                = "../02_PodIdentity_Yaml/${module.UAI1.Name}_Binding.yaml"
+  filename                                = "../02_PodIdentity_Yaml/PodId/${module.UAI1.Name}_Binding.yaml"
 }
 
 
