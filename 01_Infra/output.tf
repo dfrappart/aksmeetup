@@ -20,7 +20,7 @@ output "RGId" {
 ######################################################
 # Module VNet Outputs
 ######################################################
-/*
+
 ##############################################################
 #Output for the storage account log
 
@@ -241,7 +241,7 @@ output "SpokeBastionFullOutput" {
 }
 
 
-/*
+
 ######################################################
 # Output for the AKS module with RBAC enabled
 
@@ -352,7 +352,7 @@ output "KubeKubelet_UAI_Id" {
   value             = module.AKS1.KubeKubelet_UAI_Id
 }
 
-*/
+
 
 ######################################################################
 # Key Vault Output
@@ -629,10 +629,12 @@ output "UAI1_RBACAssignmentPrincipalType" {
 
 output "UAI1_podidentitymanifest" {
   value           = module.UAI1.podidentitymanifest
+  sensitive       = true
 }
 
 output "UAI1_podidentitybindingmanifest" {
   value           = module.UAI1.podidentitybindingmanifest
+  sensitive       = true
 }
 
 ######################################################################
