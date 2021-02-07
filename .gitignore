@@ -8,3 +8,4 @@ crash.log
 /Tests/*
 terraformbackendconfig.tf
 /02_PodIdentity_Yaml/PodId/*.yaml
+/02_PodIdentity_Yaml/SecretStore/*.yaml
