@@ -301,11 +301,9 @@ Everything seems alright, check the access to the keyvault:
 
 ```bash
 
-PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl exec nginx-secrets-store-inline ls /mnt/secrets-store
-kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl exec nginx-secrets-store-inline -- ls /mnt/secrets-store
 kvs-test01
-PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl exec nginx-secrets-store-inline cat /mnt/secrets-store/kvs-test01
-kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl exec nginx-secrets-store-inline -- cat /mnt/secrets-store/kvs-test01
 e&D}:6+<)fM!n=@!
 
 ```
