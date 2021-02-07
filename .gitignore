@@ -7,3 +7,4 @@ crash.log
 *.log
 /Tests/*
 terraformbackendconfig.tf
+/02_PodIdentity_Yaml/PodId/*.yaml
