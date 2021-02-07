@@ -114,19 +114,13 @@ terraform {
 ## This folder contains the terraform config to deploy the Azure automation resource used to managed the subscription
 
 
-### 1. List of Azure resources deployed through
+### 1. List of Azure resources deployed
 
 
 |Resources type | Resources usage | Info | naming convention |
 |---------------|:---------------:|:----:|------------------:|
 |Resource Group | Group Log storage resources | N/A |applicationname-environment-rsg-role-index |
-|Resource Group | Group Automation resoources | N/A | applicationname-environment-rsg-role-index |
 |Storage account | store the diagnostic log ofr diagnostic enabled resources | Located in the Resource Group for Logs | applicationnameenvironmentstaroleindex |
-|Automation account | Allows to run script in runbook for subscription management | Located in the Resource Group for Automation | applicationname-environment-aac-role-index |
-|Automation Runbook | This runbook contains a script for ps module update | Located in the Resource Group for Automation | No naming convention required |
-|Automation PS Module | A PS Module imported in the automation account. Specifically, the module Az.Accounts | Located in the Resource Group for Automation | No naming convention required |
-|Automation Schedule | A resource in Automation account to schedule the monthly execution of the runbook. | Located in the Resource Group for Automation | No naming convention required |
-|Automation JobSchedule | A resouce in Automation account to link a schedule and a runbook | Located in the Resource Group for Automation | No naming convention required |
 
 
 ### 2. Terraform configuration deployment - terraform.tfvars
@@ -140,42 +134,25 @@ Fill in the terraform.tfvars to input the value of the variables
 # config variables 
 ######################################################################
 
-#Provider variable
+AzureSubscriptionID                 = ""
+AzureClientID                       = ""
+AzureClientSecret                   = ""
+AzureTenantID                       = ""
 
-AzureSubscriptionID = ""
-AzureClientID       = ""
-AzureClientSecret   = ""
-AzureTenantID       = ""
 
-#Resource Group related variables
 
-AutomationAccountLocation       = "westeurope"
-AutomationAccountRGRole         = "AzAuto"
-LogRGRole                       = "Log"
-
-#Storage account diag log variable
-
-STADiaglogRole                  = "diaglogdfr"
-
-#Automation creds related variables
-AutoCredsUserName               = "autorunas@teknews.cloud"
-AutoCredsPwd                    = ""
-#Tags related resources
-applicationTag       = "INFR"
-costcenterTag        = "INFR"
-businessunitTag      = "INFR"
-managedbyTag         = "DFITC"
-environmentTag       = "DEV"
-ownerTag             = "DFR"
-roleTag              = "N/A"
-createdbyTag         = "Terraform"
+#Observability Basics variables
+ASCPricingTier                      = "Standard"
+IsDeploymentTypeGreenField           = true
+ASCContactMail                      = ""
+SubContactList                      = ""
 
 
 ```
 
 ### 3. Backend configuration
 
-Specify the azure storage account used as a backend, which should have been created with the script configurebackend.ps1, with variables value for the authentication in a file to be stored as secret in Azure Devops:
+Specify the azure storage account used as a backend
 
 
 ```hcl.js
@@ -195,9 +172,4 @@ terraform {
 ## Display after provisioning
 
 
-You should have something looking like that in the Azure portal: 
-
-![Illustration 1](./Img/readme01.png)
-
-![Illustration 1](./Img/readme02.png)
 
