@@ -1,7 +1,0 @@
-apiVersion: "aadpodidentity.k8s.io/v1"
-kind: AzureIdentityBinding
-metadata:
-  name: uailab1-binding
-spec:
-  azureIdentity: uailab1
-  selector: uailab1-binding

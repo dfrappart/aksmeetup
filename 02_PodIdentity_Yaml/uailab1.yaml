@@ -1,8 +1,0 @@
-apiVersion: "aadpodidentity.k8s.io/v1"
-kind: AzureIdentity
-metadata:
-  name: uailab1
-spec:
-  type: 0
-  resourceID: /subscriptions/49816259-cb52-4fe5-8d6f-9358ad94332c/resourceGroups/rsglabmeetup/providers/Microsoft.ManagedIdentity/userAssignedIdentities/uailab1
-  clientID: 5e6c6069-a97a-492e-9af5-564e22213aec
