@@ -68,6 +68,7 @@ module "AKS1" {
   AKSLocation                             = module.ResourceGroup.RGLocation
   AKSRGName                               = module.ResourceGroup.RGName
   AKSSubnetId                             = module.AKSSpokeVNet.FESubnetFullOutput.id
+  AKSClusSuffix                           = var.AKSClusSuffix
   PublicSSHKey                            = var.AKSSSHKey
   AKSClusterAdminsIds                     = [var.AKSClusterAdminsIds]
   ResourceOwnerTag                        = var.ResourceOwnerTag
@@ -281,7 +282,7 @@ module "UAI1" {
   source                                  = "github.com/dfrappart/Terra-AZModuletest//Custom_Modules/Kube_UAI/"
 
   #Module variable
-  UAISuffix                               = "lab1"
+  UAISuffix                               = var.UAISuffix #"lab1"
   TargetLocation                          = module.ResourceGroup.RGLocation
   TargetRG                                = module.ResourceGroup.RGName
   RBACScope                               = module.ResourceGroup.RGId
@@ -306,18 +307,26 @@ resource "local_file" "podidentitybindingmanifest" {
 }
 
 resource "local_file" "secretprovider1" {
-  content                                 = templatefile("./secretprovider-template.yaml",
+  content                                 = templatefile("./yamltemplate/secretprovider-template.yaml",
     {
       UAIClientId                         = module.UAI1.ClientId,
-      KVName                              = module.AKSKeyVault.Name
-      SecretName                          = module.SecretTest_to_KV.SecretFullOutput.name
-      SecretVersion                       = ""
+      KVName                              = module.AKSKeyVault.Name,
+      SecretName                          = module.SecretTest_to_KV.SecretFullOutput.name,
+      SecretVersion                       = "",
       TenantId                            = data.azurerm_subscription.current.tenant_id
     }
   )
   filename = "../02_PodIdentity_Yaml/SecretStore/${lower(module.AKSKeyVault.Name)}-secretstore.yaml"
 }
 
+resource "local_file" "podexample" {
+  content                                 = templatefile("./yamltemplate/TestPod-template.yaml",
+    {
+      UAIName                             = module.UAI1.Name
+    }
+  )
+  filename = "../02_PodIdentity_Yaml/demo-pod.yaml"
+}
 
 module "AKSKeyVaultAccessPolicy_UAI1" {
 
@@ -336,60 +345,3 @@ module "AKSKeyVaultAccessPolicy_UAI1" {
 
 }
 
-/*
-######################################################################
-# Mapping Test UAI to VM Operator role
-
-module "AssignUAI_Test" {
-
-  #Module Location
-  source                                  = "../../../Modules_building_blocks/401_RBACAssignment_BuiltinRole/"
-
-  #Module variable
-  RBACScope                               = module.ResourceGroup.RGId
-  BuiltinRoleName                         = "Virtual Machine Contributor"
-  ObjectId                                = module.UAI1.FullUAIOutput.principal_id
-  #module.AKS1.KubeControlPlane_SAI_PrincipalId
-
-}
-
-resource "local_file" "podidentitymanifest" {
-  content =templatefile("./podidentity-template.yaml",
-    {
-      UAIName                             = module.UAI1.Name,
-      UAIId                               = module.UAI1.Id,
-      UAIClientId                         = module.UAI1.ClientId,
-    }
-  )
-  filename = "${lower(module.UAI1.Name)}-podidentitymanifest.yaml"
-}
-
-resource "local_file" "podidentitybindingmanifest" {
-  content =templatefile("./podidentitybinding-template.yaml",
-    {
-      UAIName                             = module.UAI1.Name,
-    }
-  )
-  filename = "${lower(module.UAI1.Name)}-podidentitybindingmanifest.yaml"
-}
-
-*/
-/*
-module "AKSKeyVaultAccessPolicyAKSContrib" {
-
-  #Module Location
-  source                                  = "../../../Modules_building_blocks/411_KeyVault_Access_Policy/"
-
-  #Module variable     
-  VaultId                                 = module.AKSKeyVault.Id
-  KeyVaultTenantId                        = data.azurerm_subscription.current.tenant_id
-  KeyVaultAPObjectId                      = var.KeyVaultAPObjectId_AKSContrib_AccessPolicy
-  Secretperms                             = var.Secretperms_AKSContrib_AccessPolicy
-
-  depends_on = [
-    module.AKSKeyVault,
-  ]
-
-}
-
-*/
