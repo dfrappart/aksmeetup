@@ -166,7 +166,7 @@ Afterward, we need to install a secret store which refers to an existing keyvaul
 apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
 kind: SecretProviderClass
 metadata:
-  name: azure-kvname
+  name: ${KVName}
 spec:
   provider: azure
   parameters:
@@ -181,7 +181,7 @@ spec:
           objectAlias: ${SecretName}            
           objectType: secret                    
           objectVersion: ${SecretVersion}       
-    tenantId: ${TenantId}  
+    tenantId: ${TenantId}    
 
 
 ```
@@ -191,9 +191,9 @@ This file is generated with the proper value in the 01_Infra folder with a local
 ```bash
 
 resource "local_file" "secretprovider1" {
-  content                                 = templatefile("./secretprovider-template.yaml",
+  content                                 = templatefile("./yamltemplate/secretprovider-template.yaml",
     {
-      UAIClientId                         = module.UAI1.ClientId,
+      UAIClientId                         = module.UAI1.ClientId
       KVName                              = module.AKSKeyVault.Name
       SecretName                          = module.SecretTest_to_KV.SecretFullOutput.name
       SecretVersion                       = ""
@@ -205,7 +205,7 @@ resource "local_file" "secretprovider1" {
 
 ```
 
-Once the secret store is also created, it is time to try it with a pod on which the secret is mounted: 
+Once the secret store is also created, it is time to try it with a pod on which the secret is mounted, again from a template yaml:
 
 ```yaml
 
@@ -214,7 +214,7 @@ kind: Pod
 metadata:
   name: nginx-secrets-store-inline
   labels:
-    aadpodidbinding: uailab1-binding
+    aadpodidbinding: ${UAIName}-binding
 spec:
   containers:
     - name: nginx
@@ -229,10 +229,24 @@ spec:
         driver: secrets-store.csi.k8s.io
         readOnly: true
         volumeAttributes:
-          secretProviderClass: azure-kvname
+          secretProviderClass: ${KVName}
 
 ```
+And afterward created from a localfile resource:
 
+```bash
+
+resource "local_file" "podexample" {
+  content                                 = templatefile("./yamltemplate/TestPod-template.yaml",
+    {
+      UAIName                             = module.UAI1.Name
+      KVName                              = module.AKSKeyVault.Name
+    }
+  )
+  filename = "../02_PodIdentity_Yaml/demo-pod.yaml"
+}
+
+```
 Get the pod info status: 
 
 ```powershell
