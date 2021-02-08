@@ -300,10 +300,10 @@ resource "local_file" "podidentitybindingmanifest" {
 resource "local_file" "secretprovider1" {
   content                                 = templatefile("./yamltemplate/secretprovider-template.yaml",
     {
-      UAIClientId                         = module.UAI1.ClientId,
-      KVName                              = module.AKSKeyVault.Name,
-      SecretName                          = module.SecretTest_to_KV.SecretFullOutput.name,
-      SecretVersion                       = "",
+      UAIClientId                         = module.UAI1.ClientId
+      KVName                              = module.AKSKeyVault.Name
+      SecretName                          = module.SecretTest_to_KV.SecretFullOutput.name
+      SecretVersion                       = ""
       TenantId                            = data.azurerm_subscription.current.tenant_id
     }
   )
@@ -314,6 +314,7 @@ resource "local_file" "podexample" {
   content                                 = templatefile("./yamltemplate/TestPod-template.yaml",
     {
       UAIName                             = module.UAI1.Name
+      KVName                              = module.AKSKeyVault.Name
     }
   )
   filename = "../02_PodIdentity_Yaml/demo-pod.yaml"
