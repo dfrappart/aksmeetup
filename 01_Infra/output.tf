@@ -445,16 +445,6 @@ output "AKSKeyVaultAccessPolicy_ClusterAdmin_KeyVaultAcccessPolicyFullOutput" {
 }
 
 ######################################################################
-# Random PWD Result
-
-output "RandomPWD_Result" {
-
-  value             = module.SecretTest.Result
-  sensitive         = true 
-
-}
-
-######################################################################
 # KV Secret module output
 
 output "SecretTest_Id" {
@@ -476,80 +466,6 @@ output "SecretTest_FullOutput" {
   value             = module.SecretTest_to_KV.SecretFullOutput
   sensitive         = true 
 }
-
-/*
-######################################################################
-# UAI Output
-
-output "UAI1_FullOutput" {
-  value                 = module.UAI1.FullUAIOutput
-  sensitive             = true
-}
-output "UAI1_Id" {
-  value                 = module.UAI1.Id
-  sensitive             = true
-}
-
-output "UAI1_Name" {
-  value                 = module.UAI1.Name
-  sensitive             = false
-}
-
-output "UAI1_Location" {
-  value                 = module.UAI1.Location
-  sensitive             = false
-}
-
-output "UAI1_RG" {
-  value                 = module.UAI1.RG
-  sensitive             = false 
-}
-
-output "UAI1_PrincipalId" {
-  value                 = module.UAI1.PrincipalId
-  sensitive             = true
-
-}
-
-output "UAI1_ClientId" {
-  value                 = module.UAI1.ClientId
-  sensitive             = true
-
-}
-
-######################################################################
-# RBAC Assignment Output
-
-output "Test_RBACAssignmentFull" {
-  value           = module.AssignUAI_Test.RBACAssignmentFull
-  sensitive       = true
-}
-output "Test_RBACAssignmentGuid" {
-  value           = module.AssignUAI_Test.RBACAssignmentGuid
-}
-
-output "Test_RBACAssignmentScope" {
-  value           = module.AssignUAI_Test.RBACAssignmentScope
-}
-
-output "Test_RBACAssignmentRoleName" {
-  value           = module.AssignUAI_Test.RBACAssignmentRoleName
-}
-
-output "Test_RBACAssignmentPrincipalId" {
-  value           = module.AssignUAI_Test.RBACAssignmentPrincipalId
-  sensitive       = true
-}
-
-output "Test_RBACAssignmentId" {
-  value           = module.AssignUAI_Test.RBACAssignmentId
-}
-
-output "Test_RBACAssignmentPrincipalType" {
-  value           = module.AssignUAI_Test.RBACAssignmentPrincipalType
-}
-
-*/
 
 ######################################################################
 # Output for the UAI that will be used in kubernetes
