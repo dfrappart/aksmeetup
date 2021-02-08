@@ -175,16 +175,7 @@ module "AssignAKS_KubeletUAI_VMContributor_To_Sub" {
 
 
 ######################################################################
-# Module for random string
-
-module "SecretTest" {
-  #Module Location
-  source                                  = "github.com/dfrappart/Terra-AZModuletest//Modules_building_blocks/002_RandomPassword/"
-
-  #Module variable
-  stringlenght                               = 16
-
-}
+# Module kv
 
 # Defining a local for kv name and management with sbx
 
