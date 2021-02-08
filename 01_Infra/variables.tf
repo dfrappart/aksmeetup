@@ -68,6 +68,19 @@ variable "ResourcesSuffix" {
   default                         = "labmeetup"
 }
 
+
+variable "UAISuffix" {
+  type                            = string
+  description                     = "The environment, dev, prod..."
+  default                         = "lab1"
+}
+
+variable "AKSClusSuffix" {
+  type                          = string
+  default                       = "TerraAkSClus"
+  description                   = "A suffix to identify the cluster without breacking the naming convention"
+
+}
 ######################################################
 # Data sources variables
 
