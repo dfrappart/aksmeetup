@@ -1,4 +1,12 @@
 ######################################################
+# Subscription Output
+
+output "CurrentSubFullOutput" {
+
+  value             = data.azurerm_subscription.current
+}
+
+######################################################
 #Resource Group ouputs
 
 output "RGName" {

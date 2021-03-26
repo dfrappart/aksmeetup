@@ -71,6 +71,7 @@ module "AKS1" {
   AKSClusSuffix                           = var.AKSClusSuffix
   PublicSSHKey                            = var.AKSSSHKey
   AKSClusterAdminsIds                     = [var.AKSClusterAdminsIds]
+  ACG1Id                                  = var.SubACG
   ResourceOwnerTag                        = var.ResourceOwnerTag
   CountryTag                              = var.CountryTag
   CostCenterTag                           = var.CostCenterTag
@@ -247,7 +248,7 @@ module "SecretTest_to_KV" {
   source                                  = "github.com/dfrappart/Terra-AZModuletest//Modules_building_blocks/412_KeyvaultSecret/"
 
   #Module variable     
-  KeyVaultSecretSuffix                    = "test01"
+  KeyVaultSecretSuffix                    = var.KeyVaultSecretSuffix
   #PasswordValue                           = module.SecretTest.Result
   KeyVaultId                              = module.AKSKeyVault.Id
   ResourceOwnerTag                        = var.ResourceOwnerTag
@@ -289,12 +290,12 @@ module "UAI1" {
 
 resource "local_file" "podidentitymanifest" {
   content                                 = module.UAI1.podidentitymanifest
-  filename                                = "../02_PodIdentity_Yaml/PodId/${module.UAI1.Name}.yaml"
+  filename                                = "../03_PodIdentity_Yaml/PodId/${module.UAI1.Name}.yaml"
 }
 
 resource "local_file" "podidentitybindingmanifest" {
   content                                 = module.UAI1.podidentitybindingmanifest
-  filename                                = "../02_PodIdentity_Yaml/PodId/${module.UAI1.Name}_Binding.yaml"
+  filename                                = "../03_PodIdentity_Yaml/PodId/${module.UAI1.Name}_Binding.yaml"
 }
 
 resource "local_file" "secretprovider1" {
@@ -307,7 +308,7 @@ resource "local_file" "secretprovider1" {
       TenantId                            = data.azurerm_subscription.current.tenant_id
     }
   )
-  filename = "../02_PodIdentity_Yaml/SecretStore/${lower(module.AKSKeyVault.Name)}-secretstore.yaml"
+  filename = "../03_PodIdentity_Yaml/SecretStore/${lower(module.AKSKeyVault.Name)}-secretstore.yaml"
 }
 
 resource "local_file" "podexample" {
@@ -317,7 +318,7 @@ resource "local_file" "podexample" {
       KVName                              = module.AKSKeyVault.Name
     }
   )
-  filename = "../02_PodIdentity_Yaml/demo-pod.yaml"
+  filename = "../03_PodIdentity_Yaml/demo-pod.yaml"
 }
 
 module "AKSKeyVaultAccessPolicy_UAI1" {

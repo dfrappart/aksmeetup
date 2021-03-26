@@ -12,6 +12,11 @@ AzureTenantID                           = ""
 RGLogName                               = ""
 LawSubLogName                           = ""
 STASubLogName                           = ""
+Environment                             = ""
+UAISuffix                               = ""
+KeyVaultSecretSuffix                    = ""
 
 AKSClusterAdminsIds                     = ""
 AKSSSHKey                               = ""
+
+SubACG                                  = ""

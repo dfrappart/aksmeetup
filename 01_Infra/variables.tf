@@ -81,6 +81,13 @@ variable "AKSClusSuffix" {
   description                   = "A suffix to identify the cluster without breacking the naming convention"
 
 }
+
+variable "SubACG" {
+  type                          = string
+  description                   = "The Id of the action group created at the sub level"
+
+}
+
 ######################################################
 # Data sources variables
 
@@ -130,7 +137,12 @@ variable "Secretperms_UAI1_AccessPolicy" {
 
 }
 
+variable "KeyVaultSecretSuffix" {
+  type                            = string
+  description                     = "The kv secret suffix"
+  default                         = "test1"
 
+}
 
 
 
