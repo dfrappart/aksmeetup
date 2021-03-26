@@ -7,5 +7,7 @@ crash.log
 *.log
 /Tests/*
 terraformbackendconfig.tf
-/02_PodIdentity_Yaml/PodId/*.yaml
-/02_PodIdentity_Yaml/SecretStore/*.yaml
+/03_PodIdentity_Yaml/PodId/*.yaml
+/03_PodIdentity_Yaml/SecretStore/*.yaml
+/03_PodIdentity_Yaml/demo-pod.yaml
+04_stuff
