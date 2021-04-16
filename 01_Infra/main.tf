@@ -2,14 +2,21 @@
 # Access to Azure
 ######################################################################
 
+terraform {
+  
+  #backend "azurerm" {}
+  required_providers {
+    azurerm = {}
+  }
+}
 provider "azurerm" {
-  subscription_id                          = var.AzureSubscriptionID
-  client_id                                = var.AzureClientID
-  client_secret                            = var.AzureClientSecret
-  tenant_id                                = var.AzureTenantID
+  subscription_id          = var.AzureSubscriptionID
+  client_id                = var.AzureClientID
+  client_secret            = var.AzureClientSecret
+  tenant_id                = var.AzureTenantID
+
 
   features {}
-  
 }
 
 ######################################################################

@@ -9,6 +9,12 @@
 terraform {
 
   #backend "azurerm" {}
+
+  required_providers {
+    azurerm = {}
+    kubernetes = {}
+    helm = {}
+  }
 }
 
 provider "azurerm" {
