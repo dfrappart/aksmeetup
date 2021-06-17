@@ -29,7 +29,7 @@ module "BasicLogConfig" {
   source = "github.com/dfrappart/Terra-AZModuletest//Custom_Modules/00_AzSubLogs/"
 
   #Module variable
-
+  SubLogSuffix          = "pvaks"
   ResourceOwnerTag      = var.ResourceOwnerTag
   CountryTag            = var.CountryTag
   CostCenterTag         = var.CostCenterTag
