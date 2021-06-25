@@ -30,15 +30,6 @@ output "RGId" {
 ######################################################
 
 ##############################################################
-#Output for the storage account log
-
-output "STALogsFullOutput" {
-  value             = module.AKSSpokeVNet.STALogsFullOutput
-  sensitive         = true
-}
-
-
-##############################################################
 #Output Log analytics workspace
 
 output "LAWFullOutput" {
