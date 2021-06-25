@@ -1,10 +1,10 @@
-# Pod Identity YAML Manifest
+# Pod Identity Demo
 
 This folder contains the yaml file taken from Pod Identity OSS [site](https://azure.github.io/aad-pod-identity/docs/getting-started/installation/)
 It is used to install the last available version of pod identity with the appropriatemodification for the solution to work on AKS with kubenet.
-Future version may modify the osurce of the container image to centralize it on a dedicated rexel registry.
+A change has been made to the deployment methods, instead of using yaml manifest the helm chart is used throught a terraform configuration
 
-## Installation steps
+## Installation steps with yaml
 
 Refer to Pod identity documentation for additional details.
 The installation is done in 2 steps: 
@@ -29,69 +29,118 @@ For pod identity to be able to work, we need to add a specific arg in the contai
 
 ```
 
-Use the following command to install: 
+In the terraform configuration with helm, it appears as below:
 
-```powershell
+```bash
 
-PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl apply -f podidentityforkubenet.yaml
-serviceaccount/aad-pod-id-nmi-service-account created
-customresourcedefinition.apiextensions.k8s.io/azureassignedidentities.aadpodidentity.k8s.io created
-customresourcedefinition.apiextensions.k8s.io/azureidentitybindings.aadpodidentity.k8s.io created
-customresourcedefinition.apiextensions.k8s.io/azureidentities.aadpodidentity.k8s.io created
-customresourcedefinition.apiextensions.k8s.io/azurepodidentityexceptions.aadpodidentity.k8s.io created
-clusterrole.rbac.authorization.k8s.io/aad-pod-id-nmi-role created
-clusterrolebinding.rbac.authorization.k8s.io/aad-pod-id-nmi-binding created
-daemonset.apps/nmi created
-serviceaccount/aad-pod-id-mic-service-account created
-clusterrole.rbac.authorization.k8s.io/aad-pod-id-mic-role created
-clusterrolebinding.rbac.authorization.k8s.io/aad-pod-id-mic-binding created
-deployment.apps/mic created
-PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl apply -f podidentityexception.yaml
-azurepodidentityexception.aadpodidentity.k8s.io/mic-exception created
-azurepodidentityexception.aadpodidentity.k8s.io/aks-addon-exception created
+resource "helm_release" "podidentity" {
+  name                                = "podidentity"
+  repository                          = "https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts"
+  chart                               = "aad-pod-identity"
+  version                             = var.PodIdChartVer
+  namespace                           = "podid"
+  create_namespace                    = true
 
-```
 
-Check installation
+  dynamic "set" {
+    for_each                          = var.HelmPodIdentityParam
+    iterator                          = each
+    content {
+      name                            = each.value.ParamName
+      value                           = each.value.ParamValue
+    }
 
-```powershell
+  }
 
-PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl get pods
-NAME                   READY   STATUS    RESTARTS   AGE
-mic-7d6655bcc4-8pxx9   1/1     Running   0          2m45s
-mic-7d6655bcc4-mfwkn   1/1     Running   0          2m44s
-nmi-gjjx6              1/1     Running   0          2m45s
-nmi-xdwxc              1/1     Running   0          2m45s
+
+}
 
 ```
 
-Check the logs after installation
+Note that the version of the helm chart is configured through the variable `PodIdCharter`
+Also a namespace is created with the parameters `namespace` and `create_namespace`
+Allowing the installation on kubenet is configured through the variable `HelmPodIdentityParam`:
+
+```bash
+
+variable "HelmPodIdentityParam" {
+  type                  = map
+  description            = "A map used to feed the dynamic blocks of the pod identity helm chart"
+  default                = {
+
+      "set1" = {
+        ParamName             = "nmi.allowNetworkPluginKubenet"
+        ParamValue            = "true"
+
+    }
+      "set2" = {
+        ParamName             = "installCRDs"
+        ParamValue            = "true"
+
+    }
+
+  }
+
+}
+
+```
+Once completed, the installation can be checked
+
+## Check installation
+
+After installation, check the pods are running:
 
 ```powershell
 
-PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl logs mic-7d6655bcc4-8pxx9 --since=300s
-I0207 02:22:34.336491       1 main.go:114] starting mic process. Version: v1.7.3. Build date: 2021-02-05-22:16
-W0207 02:22:34.337401       1 main.go:119] --kubeconfig not passed will use InClusterConfig
-I0207 02:22:34.337410       1 main.go:136] kubeconfig () cloudconfig (/etc/kubernetes/azure.json)
-I0207 02:22:34.337657       1 main.go:144] running MIC in namespaced mode: false
-I0207 02:22:34.337673       1 main.go:148] client QPS set to: 5. Burst to: 5
-I0207 02:22:34.337692       1 mic.go:139] starting to create the pod identity client. Version: v1.7.3. Build date: 2021-02-05-22:16
-I0207 02:22:34.362991       1 mic.go:145] Kubernetes server version: v1.18.14
-I0207 02:22:34.363295       1 cloudprovider.go:123] MIC using user assigned identity: ae95##### REDACTED #####5f1d for authentication.
-I0207 02:22:34.365435       1 probes.go:41] initialized health probe on port 8080
-I0207 02:22:34.365446       1 probes.go:44] started health probe
-I0207 02:22:34.365512       1 metrics.go:341] registered views for metric
-I0207 02:22:34.365553       1 prometheus_exporter.go:21] starting Prometheus exporter
-I0207 02:22:34.365559       1 metrics.go:347] registered and exported metrics on port 8888
-I0207 02:22:34.365563       1 mic.go:240] initiating MIC Leader election
-I0207 02:22:34.365571       1 leaderelection.go:243] attempting to acquire leader lease  default/aad-pod-identity-mic...
-I0207 02:22:34.451011       1 leaderelection.go:253] successfully acquired lease default/aad-pod-identity-mic
-I0207 02:22:34.799053       1 mic.go:313] upgrading the types to work with case sensitive go-client
-I0207 02:22:34.825096       1 mic.go:317] type upgrade completed !!
-I0207 02:22:35.283409       1 crd.go:456] CRD informers started
-I0207 02:22:35.483460       1 pod.go:72] pod cache synchronized. Took 500.130342ms
-I0207 02:22:35.483489       1 pod.go:79] pod watcher started !!
-I0207 02:22:35.483511       1 mic.go:398] sync thread started.
+PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl get pods -n podid                            
+NAME                                   READY   STATUS    RESTARTS   AGE
+aad-pod-identity-mic-dfdcc77d4-sjlnh   1/1     Running   0          55m
+aad-pod-identity-mic-dfdcc77d4-szbv4   1/1     Running   0          60m
+aad-pod-identity-nmi-5q78p             1/1     Running   2          22h
+aad-pod-identity-nmi-wtmdp             1/1     Running   3          22h
+
+```
+
+A deployment and a daemonset should be found in the appropriate namespace
+
+```powershell
+
+PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl get deployment -n podid
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+aad-pod-identity-mic   2/2     2            2           22h
+PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml\02_TFForKube> kubectl get ds -n podid
+NAME                   DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+aad-pod-identity-nmi   2         2         2       2            2           kubernetes.io/os=linux   22h
+
+```
+
+Check the logs after installation:
+
+```powershell
+
+PS C:\Users\AKSPodIdMeetup\02_PodIdentity_Yaml> kubectl logs deployment/aad-pod-identity-mic -n podid             
+Found 2 pods, using pod/aad-pod-identity-mic-dfdcc77d4-szbv4
+I0623 07:34:33.449414       1 main.go:114] starting mic process. Version: v1.7.3. Build date: 2021-02-05-22:16
+W0623 07:34:33.449632       1 main.go:119] --kubeconfig not passed will use InClusterConfig
+I0623 07:34:33.449765       1 main.go:136] kubeconfig () cloudconfig (/etc/kubernetes/azure.json)
+I0623 07:34:33.450069       1 main.go:144] running MIC in namespaced mode: false
+I0623 07:34:33.450161       1 main.go:148] client QPS set to: 5. Burst to: 5
+I0623 07:34:33.450891       1 mic.go:139] starting to create the pod identity client. Version: v1.7.3. Build date: 2021-02-05-22:16   
+I0623 07:34:48.927152       1 mic.go:145] Kubernetes server version: v1.19.11
+I0623 07:34:48.928739       1 cloudprovider.go:123] MIC using user assigned identity: 4c6e##### REDACTED #####f2c9 for authentication.
+I0623 07:34:48.933492       1 probes.go:41] initialized health probe on port 8080
+I0623 07:34:48.933510       1 probes.go:44] started health probe
+I0623 07:34:48.933678       1 metrics.go:341] registered views for metric
+I0623 07:34:48.933730       1 prometheus_exporter.go:21] starting Prometheus exporter
+I0623 07:34:48.933778       1 metrics.go:347] registered and exported metrics on port 8888
+I0623 07:34:48.933804       1 mic.go:240] initiating MIC Leader election
+I0623 07:34:48.933852       1 leaderelection.go:243] attempting to acquire leader lease  default/aad-pod-identity-mic...
+I0623 07:40:17.017939       1 leaderelection.go:253] successfully acquired lease default/aad-pod-identity-mic
+I0623 07:40:17.023761       1 mic.go:328] type upgrade status configmap found from version: v1.7.3. Skipping type upgrade!
+I0623 07:40:17.124067       1 crd.go:456] CRD informers started
+I0623 07:40:17.224936       1 pod.go:72] pod cache synchronized. Took 201.111265ms
+I0623 07:40:17.224955       1 pod.go:79] pod watcher started !!
+I0623 07:40:17.425045       1 mic.go:398] sync thread started.
 
 ```
 
@@ -316,8 +365,8 @@ Everything seems alright, check the access to the keyvault:
 ```bash
 
 PS C:\Users\AKSPodIdMeetup\03_PodIdentity_Yaml> kubectl exec nginx-secrets-store-inline -- ls /mnt/secrets-store
-kvs-test01
-PS C:\Users\AKSPodIdMeetup\03_PodIdentity_Yaml> kubectl exec nginx-secrets-store-inline -- cat /mnt/secrets-store/kvs-test01
+kvs-demo1
+PS C:\Users\AKSPodIdMeetup\03_PodIdentity_Yaml> kubectl exec nginx-secrets-store-inline -- cat /mnt/secrets-store/kvs-demo1
 e&D}:6+<)fM!n=@!
 
 ```
