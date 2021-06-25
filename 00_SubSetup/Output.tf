@@ -135,34 +135,15 @@ output "STALogConnectionURI" {
 ###################################################################
 #Output for the log analytics workspace
 
-output "SubLogAnalyticsWSId" {
-  value                   = module.BasicLogConfig.SubLogAnalyticsWSId
-  sensitive               = true
+output "SubLogAnalyticsFull" {
+  value                     = module.BasicLogConfig.SubLogAnalyticsFull
+  sensitive                 = true
 }
 
-output "SubLogAnalyticsWS_WSId" {
-  value                   = module.BasicLogConfig.SubLogAnalyticsWS_WSId
-  sensitive               = true
-}
+output "SubLogAnalyticsName" {
+  value                     = module.BasicLogConfig.SubLogAnalyticsFull.name
+  sensitive                 = true
 
-output "SubLogAnalyticsWS_Retention" {
-  value                   = module.BasicLogConfig.SubLogAnalyticsWS_Retention
-  
-}
-
-output "SubLogAnalyticsWS_PrimaryAccessKey" {
-  value = module.BasicLogConfig.SubLogAnalyticsWS_PrimaryAccessKey
-  sensitive               = true 
-}
-
-output "SubLogAnalyticsWS_SecondaryAccessKey" {
-  value                   = module.BasicLogConfig.SubLogAnalyticsWS_SecondaryAccessKey
-  sensitive               = true  
-}
-
-output "SubLogAnalyticsWS_PortalURL" {
-  value                   = module.BasicLogConfig.SubLogAnalyticsWS_PortalURL
-  sensitive               = true  
 }
 
 
