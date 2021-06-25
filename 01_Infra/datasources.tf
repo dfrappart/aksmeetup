@@ -11,20 +11,45 @@ data "azurerm_subscription" "current" {}
 
 data "azurerm_client_config" "currentclientconfig" {}
 
+#############################################################################
+#data source for Network State
+
+
+
+data "terraform_remote_state" "Subsetupstate" {
+  backend                     = "azurerm"
+  config                      = {
+    storage_account_name      = var.SubsetupSTOAName
+    container_name            = var.SubsetupContainerName
+    key                       = var.SubsetupKey
+    access_key                = var.SubsetupAccessKey
+  }
+}
+
+#############################################################################
+#Data source for the RG Log
+
 data "azurerm_resource_group" "RGLog" {
-  name                  = var.RGLogName
+  name                  = data.terraform_remote_state.Subsetupstate.outputs.RGLogName
 }
 
 #Data source for the log storage
 
-data "azurerm_storage_account" "STALogName" {
-  name                  = var.STASubLogName
+data "azurerm_storage_account" "STALog" {
+  name                  = data.terraform_remote_state.Subsetupstate.outputs.STALogName
   resource_group_name   = data.azurerm_resource_group.RGLog.name
 }
 
 #Data source for the log analytics workspace
 
-data "azurerm_log_analytics_workspace" "LAWLogName" {
-  name                  = var.LawSubLogName
+data "azurerm_log_analytics_workspace" "LAWLog" {
+  name                  = data.terraform_remote_state.Subsetupstate.outputs.SubLogAnalyticsName
+  resource_group_name   = data.azurerm_resource_group.RGLog.name
+}
+
+#Data source for the ACG
+
+data "azurerm_monitor_action_group" "SubACG" {
+  name                  = data.terraform_remote_state.Subsetupstate.outputs.DefaultSubActionGroupName
   resource_group_name   = data.azurerm_resource_group.RGLog.name
 }
