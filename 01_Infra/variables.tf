@@ -53,7 +53,7 @@ variable "CostCenterTag" {
 variable "Project" {
   type                            = string
   description                     = "The name of the project"
-  default                         = "aksmeetup"
+  default                         = "azday"
 }
 
 variable "Environment" {
@@ -65,7 +65,7 @@ variable "Environment" {
 variable "ResourcesSuffix" {
   type                            = string
   description                     = "The environment, dev, prod..."
-  default                         = "labmeetup"
+  default                         = "lab"
 }
 
 
@@ -77,33 +77,38 @@ variable "UAISuffix" {
 
 variable "AKSClusSuffix" {
   type                          = string
-  default                       = "TerraAkSClus"
+  default                       = "azday"
   description                   = "A suffix to identify the cluster without breacking the naming convention"
 
 }
 
-variable "SubACG" {
-  type                          = string
-  description                   = "The Id of the action group created at the sub level"
 
-}
 
 ######################################################
 # Data sources variables
 
-variable "RGLogName" {
-  type          = string
-  description   = "name of the RG containing the logs collector objects (sta and log analytics)"
+######################################################
+# Data sources variables
+
+
+variable "SubsetupSTOAName" {
+  type                            = string
+  description                     = "Name of the storage account containing the remote state"
 }
 
-variable "LawSubLogName" {
-  type          = string
-  description   = "name of the log analytics workspace containing the logs"
+variable "SubsetupAccessKey" {
+  type                            = string
+  description                     = "Access Key of the storage account containing the remote state"
 }
 
-variable "STASubLogName" {
-  type          = string
-  description   = "name of the storage account containing the logs"
+variable "SubsetupContainerName" {
+  type                            = string
+  description                     = "Name of the container in the storage account containing the remote state"
+}
+
+variable "SubsetupKey" {
+  type                            = string
+  description                     = "State key"
 }
 
 ######################################################
