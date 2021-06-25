@@ -6,6 +6,15 @@
 # Access to Azure
 ######################################################################
 
+terraform {
+  
+  #backend "azurerm" {}
+  required_providers {
+    azurerm = {}
+
+  }
+}
+
 provider "azurerm" {
   subscription_id                          = var.AzureSubscriptionID
   client_id                                = var.AzureClientID
@@ -29,7 +38,7 @@ module "BasicLogConfig" {
   source = "github.com/dfrappart/Terra-AZModuletest//Custom_Modules/00_AzSubLogs/"
 
   #Module variable
-  SubLogSuffix          = "pvaks"
+  SubLogSuffix          = var.Project
   ResourceOwnerTag      = var.ResourceOwnerTag
   CountryTag            = var.CountryTag
   CostCenterTag         = var.CostCenterTag
