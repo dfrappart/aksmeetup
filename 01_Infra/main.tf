@@ -46,8 +46,8 @@ module "AKSSpokeVNet" {
 
   #Module variable
   RGLogName                               = data.azurerm_resource_group.RGLog.name
-  LawSubLogName                           = data.azurerm_log_analytics_workspace.LAWLogName.name
-  STASubLogName                           = data.azurerm_storage_account.STALogName.name
+  LawSubLogName                           = data.azurerm_log_analytics_workspace.LAWLog.name
+  STALogId                                = data.azurerm_storage_account.STALog.id
   TargetRG                                = module.ResourceGroup.RGName
   TargetLocation                          = module.ResourceGroup.RGLocation
   VNetSuffix                              = var.ResourcesSuffix
@@ -64,13 +64,28 @@ module "AKSSpokeVNet" {
 ######################################################################
 # Module for AKS
 
+# UAI for AKS
+
+module "UAI_AKS" {
+
+  #Module location
+  source = "github.com/dfrappart/Terra-AZModuletest//Modules_building_blocks//441_UserAssignedIdentity/"
+  
+  #Module variable
+  UAISuffix                               = "aks-${lower(var.AKSClusSuffix)}"
+  TargetRG                                = module.ResourceGroup.RGName
+
+}
+
+# AKS Cluster
+
 module "AKS1" {
   #Module Location
   source                                  = "github.com/dfrappart/Terra-AZModuletest//Custom_Modules/IaaS_AKS_ClusterwithRBAC_Kubenet/"
 
   #Module variable
-  STASubLogId                             = data.azurerm_storage_account.STALogName.id
-  LawSubLogId                             = data.azurerm_log_analytics_workspace.LAWLogName.id
+  STASubLogId                             = data.azurerm_storage_account.STALog.id
+  LawSubLogId                             = data.azurerm_log_analytics_workspace.LAWLog.id
 
   AKSLocation                             = module.ResourceGroup.RGLocation
   AKSRGName                               = module.ResourceGroup.RGName
@@ -78,7 +93,13 @@ module "AKS1" {
   AKSClusSuffix                           = var.AKSClusSuffix
   PublicSSHKey                            = var.AKSSSHKey
   AKSClusterAdminsIds                     = [var.AKSClusterAdminsIds]
-  ACG1Id                                  = var.SubACG
+  AKSIdentityType                         = "UserAssigned"
+  UAIId                                   = module.UAI_AKS.FullUAIOutput.id
+  #UseAKSNodeRGDefaultName                 = true
+  #AKSNodesRG                              = "rsgaksnode"
+  #IsAKSPrivate                            = true
+  #PrivateDNSZoneId                        = module.PrivDNS.PrivateDNSZoneFull.id
+  ACG1Id                                  = data.azurerm_monitor_action_group.SubACG.id
   ResourceOwnerTag                        = var.ResourceOwnerTag
   CountryTag                              = var.CountryTag
   CostCenterTag                           = var.CostCenterTag
@@ -87,6 +108,33 @@ module "AKS1" {
 
 }
 
+/*
+######################################################################
+# Module for AKS DNS Zone
+module "PrivDNS" {
+
+  #Module location
+  source = "github.com/dfrappart/Terra-AZModuletest//Modules_building_blocks//241_PrivateDNSZone/"
+  
+  #Module variable
+  PrivateDNSDomainName                  = "privatelink.westeurope.azmk8s.io"
+  RGName                                = module.ResourceGroup.RGName
+  SOARecordEmail                        = "azureprivatedns-host.microsoft.com"
+
+}
+
+module "AssignAKS_UAI_DNSZoneContributor_To_RGVNet" {
+
+  #Module Location
+  source                                  = "github.com/dfrappart/Terra-AZModuletest//Modules_building_blocks/401_RBACAssignment_BuiltinRole/"
+
+  #Module variable
+  RBACScope                               = module.ResourceGroup.RGId
+  BuiltinRoleName                         = "Private DNS Zone Contributor"
+  ObjectId                                = module.UAI_AKS.FullUAIOutput.principal_id
+
+}
+*/
 
 ######################################################################
 # Mapping AKS SAI to VNet
@@ -99,7 +147,7 @@ module "AssignAKS_SAI_NTWContributor_To_RGVNet" {
   #Module variable
   RBACScope                               = module.ResourceGroup.RGId
   BuiltinRoleName                         = "Network Contributor"
-  ObjectId                                = module.AKS1.KubeControlPlane_SAI_PrincipalId
+  ObjectId                                = module.UAI_AKS.FullUAIOutput.principal_id
 
 }
 
@@ -114,7 +162,7 @@ module "AssignAKS_SAI_ManagedIdentityOps_To_Sub" {
   #Module variable
   RBACScope                               = data.azurerm_subscription.current.id
   BuiltinRoleName                         = "Managed Identity Operator"
-  ObjectId                                = module.AKS1.KubeControlPlane_SAI_PrincipalId
+  ObjectId                                = module.UAI_AKS.FullUAIOutput.principal_id
 
 }
 
@@ -129,7 +177,7 @@ module "AssignAKS_SAI_VMContributor_To_Sub" {
   #Module variable
   RBACScope                               = data.azurerm_subscription.current.id
   BuiltinRoleName                         = "Virtual Machine Contributor"
-  ObjectId                                = module.AKS1.KubeControlPlane_SAI_PrincipalId
+  ObjectId                                = module.UAI_AKS.FullUAIOutput.principal_id
 
 }
 
@@ -200,8 +248,8 @@ module "AKSKeyVault" {
   TargetRG                                = module.ResourceGroup.RGName
   TargetLocation                          = module.ResourceGroup.RGLocation
   KeyVaultTenantID                        = data.azurerm_subscription.current.tenant_id
-  STASubLogId                             = data.azurerm_storage_account.STALogName.id
-  LawSubLogId                             = data.azurerm_log_analytics_workspace.LAWLogName.id
+  STASubLogId                             = data.azurerm_storage_account.STALog.id
+  LawSubLogId                             = data.azurerm_log_analytics_workspace.LAWLog.id
   KeyVaultSuffix                          = local.KVSuffix
   ResourceOwnerTag                        = var.ResourceOwnerTag
   CountryTag                              = var.CountryTag
