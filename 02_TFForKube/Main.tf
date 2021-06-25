@@ -111,6 +111,8 @@ resource "helm_release" "podidentity" {
   repository                          = "https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts"
   chart                               = "aad-pod-identity"
   version                             = var.PodIdChartVer
+  namespace                           = "podid"
+  create_namespace                    = true
 
 
   dynamic "set" {
