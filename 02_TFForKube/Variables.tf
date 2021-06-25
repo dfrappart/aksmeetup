@@ -96,13 +96,13 @@ variable "AzureTenantID" {
 
 variable "kubepath" {
   type                          = string
-  description                   = "The Application secret"
+  description                   = "The path to ./kube/config"
 
 }
 
 variable "kubecontext" {
   type                          = string
-  description                   = "The Azure AD tenant ID"
+  description                   = "The name of the kube context"
 }
 
 ##############################################################
@@ -237,7 +237,7 @@ variable "HelmPromParam" {
 variable "PodIdChartVer" {
   type                          = string
   description                   = "The version of the chart"
-  default                       = "3.0.2"
+  default                       = "4.1.1"
 }
 
 variable "HelmPodIdentityParam" {
